@@ -362,6 +362,12 @@ const styles = `
 .profile-location {
   font-size: 14px;
   color: #888;
+  margin: 0 0 6px 0;
+}
+
+.profile-email {
+  font-size: 14px;
+  color: #888;
   margin: 0 0 24px 0;
 }
 
@@ -527,6 +533,9 @@ function ProfileDetail({ user, onClose }) {
           <h2 className="profile-name">{user.name}</h2>
           <p className="profile-title">{user.title}</p>
           <p className="profile-location">📍 {user.location}</p>
+          {user.email && (
+            <p className="profile-email">✉️ {user.email}</p>
+          )}
 
           {user.interests && user.interests.length > 0 && (
             <div className="profile-interests">
