@@ -3,36 +3,85 @@ import ActionForm from './ActionForm';
 import PageHeader from './PageHeader';
 import JournalTimeline from './JournalTimeline';
 import "./HeroJournal.css";
+import { journalAPI, userAPI } from '../services/api';
 
-const initialTracks = [
-  { id: 't1', name: 'Environment', points: 1250, color: '#10b981' }, 
-  { id: 't2', name: 'Education', points: 980, color: '#3b82f6' },   
-  { id: 't3', name: 'Social Work', points: 850, color: '#f59e0b' },
-  { id: 't4', name: 'Healthcare', points: 400, color: '#ef4444' },
-  { id: 't5', name: 'Animal Welfare', points: 300, color: '#ec4899' },
-  { id: 't6', name: 'Disaster Relief', points: 150, color: '#6366f1' },
-];
+const TRACK_COLORS = {
+  Environment: '#10b981',
+  Education: '#3b82f6',
+  'Social Work': '#f59e0b',
+  Healthcare: '#ef4444',
+  'Animal Welfare': '#ec4899',
+  'Disaster Relief': '#6366f1',
+};
 
 export default function HeroJournal() {
-  const [tracks] = useState(initialTracks);
+  const [tracks, setTracks] = useState([]);
   const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('journalEntries');
-    if (saved) setEntries(JSON.parse(saved));
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [apiTracks, apiEntries] = await Promise.all([
+          userAPI.getTracks(),
+          journalAPI.getEntries(),
+        ]);
+
+        const mappedTracks = apiTracks.map((track, index) => ({
+          id: track._id || `track-${index}`,
+          name: track.name,
+          points: track.points ?? 0,
+          color: TRACK_COLORS[track.name] || '#6366f1',
+        }));
+
+        const mappedEntries = apiEntries.map(entry => ({
+          ...entry,
+          id: entry._id || entry.id,
+        }));
+
+        setTracks(mappedTracks);
+        setEntries(mappedEntries);
+      } catch (err) {
+        console.error('Failed to load journal data:', err);
+        setError('Could not load your journal yet. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
-  const onAddEntry = (entry) => {
-    const newEntries = [...entries, { ...entry, id: Date.now() }];
-    setEntries(newEntries);
-    localStorage.setItem('journalEntries', JSON.stringify(newEntries));
+  const onAddEntry = async (entry) => {
+    try {
+      setError(null);
+      // Create entry in backend – this also increments track points there
+      const response = await journalAPI.createEntry(entry.content, entry.category);
+      const createdEntry = {
+        ...response.entry,
+        id: response.entry._id || response.entry.id,
+      };
 
-    // Increase points for the category
-    const updatedTracks = tracks.map(track => 
-      track.name === entry.category ? { ...track, points: track.points + 10 } : track
-    );
-    // Note: Since tracks is state, but for simplicity, update localStorage
-    localStorage.setItem('userTracks', JSON.stringify(updatedTracks));
+      // Show newest first
+      setEntries(prev => [createdEntry, ...prev]);
+
+      // Refresh tracks from backend so points stay in sync with MongoDB
+      const updatedTracks = await userAPI.getTracks();
+      const mappedTracks = updatedTracks.map((track, index) => ({
+        id: track._id || `track-${index}`,
+        name: track.name,
+        points: track.points ?? 0,
+        color: TRACK_COLORS[track.name] || '#6366f1',
+      }));
+      setTracks(mappedTracks);
+    } catch (err) {
+      console.error('Failed to add journal entry:', err);
+      setError(err.message || 'Could not save your entry. Please try again.');
+    }
   };
 
   return (
@@ -40,7 +89,11 @@ export default function HeroJournal() {
       <PageHeader title="Hero Journal" description="Document your actions and reflect on your impact." />
       <div className="journal-grid">
         <ActionForm tracks={tracks} onSubmit={onAddEntry} />
-        <JournalTimeline entries={entries} />
+        <div>
+          {loading && <p>Loading your journal...</p>}
+          {error && !loading && <p style={{ color: 'red' }}>{error}</p>}
+          {!loading && <JournalTimeline entries={entries} />}
+        </div>
       </div>
     </div>
   );
