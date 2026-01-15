@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PageHeader from '../components/PageHeader';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext.jsx';
+import AuthPage from './AuthPage.jsx';
 
 export default function HomePage() {
+  const { token } = useContext(AuthContext);
+
+  if (!token) {
+    return <AuthPage />;
+  }
+
   return (
     <div style={{
       padding: '2rem',
@@ -22,9 +30,9 @@ export default function HomePage() {
         borderRadius: '20px',
         padding: '2rem',
         border: '1px solid rgba(255, 255, 255, 0.2)',
-        color: '#fff'
+        color: '#000'
       }}>
-        <h2 style={{ fontSize: '24px', marginBottom: '1.5rem' }}>Explore the features:</h2>
+        <h2 style={{ fontSize: '24px', marginBottom: '1.5rem', color: '#000' }}>Explore the features:</h2>
         <ul style={{
           listStyle: 'none',
           padding: 0,
@@ -35,7 +43,7 @@ export default function HomePage() {
           <li>
             <Link to="/profile" style={{
               textDecoration: 'none',
-              color: '#fff',
+              color: '#000',
               fontSize: '18px',
               padding: '1rem',
               display: 'block',
