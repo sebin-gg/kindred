@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import "./MyHeroSpace.css"; 
 import PageHeader from "./PageHeader";
 import TrackStatsSection from "./TrackStatsSection";
@@ -14,22 +14,21 @@ const initialTracks = [
   { id: 't6', name: 'Disaster Relief', points: 150, color: '#6366f1' },
 ];
 
-export default function MyHeroSpace() {
-  const [userTracks, setUserTracks] = useState(initialTracks);
-  const [currentTitle, setCurrentTitle] = useState('');
-  const [isAnimating, setIsAnimating] = useState(false);
+function getInitialTracks() {
+  const savedTracks = localStorage.getItem('userTracks');
+  return savedTracks ? JSON.parse(savedTracks) : initialTracks;
+}
 
-  useEffect(() => {
-    const savedTitle = localStorage.getItem('currentTitle');
-    const savedTracks = localStorage.getItem('userTracks');
-    let tracks = initialTracks;
-    if (savedTracks) {
-      tracks = JSON.parse(savedTracks);
-      setUserTracks(tracks);
-    }
-    const title = savedTitle || getCurrentTitle(tracks);
-    setCurrentTitle(title);
-  }, []);
+function getInitialTitle() {
+  const savedTitle = localStorage.getItem('currentTitle');
+  const tracks = getInitialTracks();
+  return savedTitle || getCurrentTitle(tracks);
+}
+
+export default function MyHeroSpace() {
+  const [userTracks] = useState(getInitialTracks);
+  const [currentTitle, setCurrentTitle] = useState(getInitialTitle);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleGenerate = () => {
     setIsAnimating(true);
