@@ -1,0 +1,182 @@
+.hero-container { max-width: 1100px; margin: auto; }
+
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+
+/* Glass Panels */
+.primary-view, .stats-view { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 15px; padding: 20px; }
+
+/* Animation Scene */
+.animation-scene { position: relative; overflow: hidden; }
+
+.falling-badge {
+  position: absolute;
+  font-size: 2rem;
+  animation: fallToCenter 2s ease-in-out infinite;
+  top: -50px;
+}
+
+.falling-badge:nth-child(1) { left: 20%; animation-delay: 0s; }
+.falling-badge:nth-child(2) { left: 50%; animation-delay: 0.5s; }
+.falling-badge:nth-child(3) { left: 80%; animation-delay: 1s; }
+
+.merging-core {
+  position: absolute;
+  font-size: 3rem;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: explodeCore 1s ease-out 2s forwards;
+}
+
+@keyframes fallToCenter {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+  50% { transform: translateY(50px) rotate(180deg); opacity: 0.8; }
+  100% { transform: translateY(0) rotate(360deg); opacity: 0; }
+}
+
+@keyframes explodeCore {
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+/* Current Title Card */
+.current-title-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+.big-number {
+  font-size: 2.5rem;
+  margin: 20px 0;
+  color: #000;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+  font-weight: bold;
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  border: none;
+  border-radius: 25px;
+  padding: 12px 24px;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 15px 0;
+  box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 242, 254, 0.4);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.top-tracks {
+  margin-top: 20px;
+}
+
+.top-tracks h3 {
+  color: #000;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.top-tracks div {
+  color: #000;
+  margin: 5px 0;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Track Stats Section */
+.track-stats {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: #000;
+}
+
+.track-stats h3 {
+  color: #000;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.track {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+}
+
+.track:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.track-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #000;
+}
+
+.track-points {
+  color: #000;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Page Header */
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.page-header h1 {
+  color: #000;
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
+  text-shadow: 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.page-header p {
+  color: #000;
+  font-size: 1.1rem;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+}
