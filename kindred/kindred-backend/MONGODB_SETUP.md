@@ -67,7 +67,8 @@ If you prefer not to install MongoDB locally:
 4. Get your connection string
 5. Update `.env` file:
    ```
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/kindred?retryWrites=true&w=majority
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>
+
    ```
 
 ### Step 5: Test the Connection
@@ -115,3 +116,4 @@ mongosh mongodb://127.0.0.1:27017
 ```
 
 If you can connect, your backend should work too!
+
