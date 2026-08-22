@@ -63,11 +63,12 @@ export default function AuthPage() {
       <form onSubmit={handleSubmit}>
         {!isLogin && (
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ color: '#000', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
+            <label htmlFor="auth-name" style={{ color: '#000', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
               Name
             </label>
             <input
               type="text"
+              id="auth-name"
               name="name"
               value={formData.name}
               onChange={handleChange}
@@ -86,11 +87,12 @@ export default function AuthPage() {
         )}
 
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ color: '#000', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
+          <label htmlFor="auth-email" style={{ color: '#000', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
             Email
           </label>
           <input
             type="email"
+            id="auth-email"
             name="email"
             value={formData.email}
             onChange={handleChange}
@@ -151,6 +153,7 @@ export default function AuthPage() {
       <div style={{ textAlign: 'center', marginTop: '20px', color: '#000' }}>
         {isLogin ? "Don't have an account? " : 'Already have an account? '}
         <button
+          type="button"
           onClick={() => {
             setIsLogin(!isLogin);
             setFormData({ name: '', email: '', password: '' });

@@ -13,15 +13,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-const allowedOrigins = [
+const allowedOrigins = new Set([
   'http://localhost:5173',
   process.env.FRONTEND_URL
-].filter(Boolean);
+].filter(Boolean));
+
+app.disable('x-powered-by');
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.has(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));

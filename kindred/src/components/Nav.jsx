@@ -78,6 +78,7 @@ export default function Nav() {
       {token && (
         <>
           <button
+            type="button"
             onClick={handleLogout}
             style={{
               padding: '8px 16px',
