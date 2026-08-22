@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "express": "^4.22.2",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "bcryptjs": "^3.0.3",
     "jsonwebtoken": "^9.0.0",
