@@ -230,7 +230,7 @@ export function getCurrentTitle(tracks) {
   const comboKey = topTracks
     .map(t => t.name)
     .filter(Boolean)
-    .sort()
+    .sort((a, b) => a.localeCompare(b))
     .join(' | ');
 
   const totalPoints = topTracks.reduce((sum, t) => sum + (t.points || 0), 0);
