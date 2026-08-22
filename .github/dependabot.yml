@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /kindred/kindred-backend
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /kindred
+    schedule:
+      interval: daily
