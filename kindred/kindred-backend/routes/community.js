@@ -3,6 +3,8 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
+const escapeRegex = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 // Get all visible community members
 router.get('/members', async (req, res) => {
   try {
@@ -11,7 +13,7 @@ router.get('/members', async (req, res) => {
     let query = { isCommunityVisible: true };
 
     if (location) {
-      query.location = { $regex: location, $options: 'i' };
+      query.location = { $regex: escapeRegex(location), $options: 'i' };
     }
 
     if (interest) {

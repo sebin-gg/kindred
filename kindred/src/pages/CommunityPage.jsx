@@ -452,8 +452,9 @@ function FilterBar({ filters, setFilters }) {
       <h2 className="refine-title">Refine</h2>
       
       <div className="filter-group">
-        <label className="filter-label">Location</label>
+        <label className="filter-label" htmlFor="filter-location">Location</label>
         <select
+          id="filter-location"
           className="filter-select"
           value={filters.location}
           onChange={e => setFilters({ ...filters, location: e.target.value })}
@@ -466,8 +467,9 @@ function FilterBar({ filters, setFilters }) {
       </div>
 
       <div className="filter-group">
-        <label className="filter-label">Interest Area</label>
+        <label className="filter-label" htmlFor="filter-interest">Interest Area</label>
         <select
+          id="filter-interest"
           className="filter-select"
           value={filters.interest}
           onChange={e => setFilters({ ...filters, interest: e.target.value })}
@@ -513,7 +515,7 @@ function ProfileCard({ user, onView }) {
         )}
       </div>
 
-      <button className="view-profile-btn" onClick={() => onView(user)}>
+      <button type="button" className="view-profile-btn" onClick={() => onView(user)}>
         View profile
       </button>
     </div>
@@ -527,7 +529,7 @@ function ProfileDetail({ user, onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>×</button>
+        <button type="button" className="modal-close" onClick={onClose} aria-label="Close profile">x</button>
         
         <div className="profile-detail">
           <h2 className="profile-name">{user.name}</h2>

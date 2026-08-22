@@ -12,7 +12,7 @@ export default function CurrentTitleCard({ title, isAnimating, onGenerate, topTr
         </>
       )}
       <h2 className="big-number">{title}</h2>
-      <button onClick={onGenerate} disabled={isAnimating} className="submit-btn">
+      <button type="button" onClick={onGenerate} disabled={isAnimating} className="submit-btn">
         {isAnimating ? 'Merging...' : 'Generate New Title'}
       </button>
       <div className="top-tracks">

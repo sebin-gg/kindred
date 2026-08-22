@@ -11,6 +11,7 @@ const VisibilitySection = React.memo(({ user, updateUser }) => {
             checked={user.isCommunityVisible}
             onChange={(e) => updateUser({ isCommunityVisible: e.target.checked })}
           />
+          {' '}
           Make profile visible in community
         </label>
         <p>Allow others in the community to see your profile.</p>

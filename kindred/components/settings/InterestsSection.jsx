@@ -24,12 +24,12 @@ const InterestsSection = React.memo(({ user, updateUser }) => {
           onChange={(e) => setNewInterest(e.target.value)}
           placeholder="Add an interest"
         />
-        <button onClick={addInterest}>Add</button>
+        <button type="button" onClick={addInterest}>Add</button>
       </div>
       <ul>
         {user.interests.map((interest, index) => (
-          <li key={index}>
-            {interest} <button onClick={() => removeInterest(index)}>Remove</button>
+          <li key={interest}>
+            {interest} <button type="button" onClick={() => removeInterest(index)}>Remove</button>
           </li>
         ))}
       </ul>

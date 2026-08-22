@@ -34,6 +34,8 @@ export default function AuthPage() {
     }
   };
 
+
+  const submitLabel = loading ? 'Loading...' : isLogin ? 'Login' : 'Register';
   return (
     <div style={{
       maxWidth: '400px',
@@ -110,11 +112,12 @@ export default function AuthPage() {
         </div>
 
         <div style={{ marginBottom: '20px' }}>
-          <label style={{ color: '#000', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
+          <label htmlFor="auth-password" style={{ color: '#000', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
             Password
           </label>
           <input
             type="password"
+            id="auth-password"
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -146,7 +149,7 @@ export default function AuthPage() {
             opacity: loading ? 0.7 : 1,
           }}
         >
-          {loading ? 'Loading...' : isLogin ? 'Login' : 'Register'}
+          {submitLabel}
         </button>
       </form>
 

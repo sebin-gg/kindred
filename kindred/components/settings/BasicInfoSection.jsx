@@ -5,36 +5,40 @@ const BasicInfoSection = React.memo(({ user, updateUser }) => {
     <div className="basic-info-section">
       <h3>Basic Information</h3>
       <div className="form-group">
-        <label>Name:</label>
+        <label for="settings-name">Name:</label>
         <input
           type="text"
           value={user.name}
+          id="settings-name"
           onChange={(e) => updateUser({ name: e.target.value })}
           placeholder="Enter your name"
         />
       </div>
       <div className="form-group">
-        <label>Location:</label>
+        <label for="settings-location">Location:</label>
         <input
           type="text"
           value={user.location}
+          id="settings-location"
           onChange={(e) => updateUser({ location: e.target.value })}
           placeholder="Enter your location"
         />
       </div>
       <div className="form-group">
-        <label>Title:</label>
+        <label for="settings-title">Title:</label>
         <input
           type="text"
           value={user.title}
+          id="settings-title"
           onChange={(e) => updateUser({ title: e.target.value })}
           placeholder="Enter your title"
         />
       </div>
       <div className="form-group">
-        <label>Bio:</label>
+        <label for="settings-bio">Bio:</label>
         <textarea
           value={user.bio}
+          id="settings-bio"
           onChange={(e) => updateUser({ bio: e.target.value })}
           placeholder="Tell us about yourself"
         />

@@ -13,13 +13,13 @@ export default function ActionForm({ tracks, onSubmit }) {
 
   return (
     <div className="form-group">
-      <label>Category</label>
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
+      <label htmlFor="action-category">Category</label>
+      <select id="action-category" value={category} onChange={(e) => setCategory(e.target.value)}>
         <option value="">Select category</option>
         {tracks.map(track => <option key={track.id} value={track.name}>{track.name}</option>)}
       </select>
-      <label>Action Description</label>
-      <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Describe your action..." />
+      <label htmlFor="action-description">Action Description</label>
+      <textarea id="action-description" value={content} onChange={(e) => setContent(e.target.value)} placeholder="Describe your action..." />
       <button type="submit" onClick={handleSubmit} className="submit-btn">Add Entry</button>
     </div>
   );
