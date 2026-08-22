@@ -36,7 +36,7 @@ router.get('/members/:userId', async (req, res) => {
     const member = await User.findById(req.params.userId)
       .select('-password');
 
-    if (!member || !member.isCommunityVisible) {
+    if (!member?.isCommunityVisible) {
       return res.status(404).json({ error: 'Member not found' });
     }
 

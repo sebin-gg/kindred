@@ -35,7 +35,12 @@ export default function AuthPage() {
   };
 
 
-  const submitLabel = loading ? 'Loading...' : isLogin ? 'Login' : 'Register';
+  let submitLabel = 'Register';
+  if (loading) {
+    submitLabel = 'Loading...';
+  } else if (isLogin) {
+    submitLabel = 'Login';
+  }
   return (
     <div style={{
       maxWidth: '400px',

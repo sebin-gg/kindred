@@ -5,7 +5,7 @@ const BasicInfoSection = React.memo(({ user, updateUser }) => {
     <div className="basic-info-section">
       <h3>Basic Information</h3>
       <div className="form-group">
-        <label for="settings-name">Name:</label>
+        <label htmlFor="settings-name">Name:</label>
         <input
           type="text"
           value={user.name}
@@ -15,7 +15,7 @@ const BasicInfoSection = React.memo(({ user, updateUser }) => {
         />
       </div>
       <div className="form-group">
-        <label for="settings-location">Location:</label>
+        <label htmlFor="settings-location">Location:</label>
         <input
           type="text"
           value={user.location}
@@ -25,7 +25,7 @@ const BasicInfoSection = React.memo(({ user, updateUser }) => {
         />
       </div>
       <div className="form-group">
-        <label for="settings-title">Title:</label>
+        <label htmlFor="settings-title">Title:</label>
         <input
           type="text"
           value={user.title}
@@ -35,7 +35,7 @@ const BasicInfoSection = React.memo(({ user, updateUser }) => {
         />
       </div>
       <div className="form-group">
-        <label for="settings-bio">Bio:</label>
+        <label htmlFor="settings-bio">Bio:</label>
         <textarea
           value={user.bio}
           id="settings-bio"

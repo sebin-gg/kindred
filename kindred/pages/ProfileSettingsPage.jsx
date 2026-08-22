@@ -8,7 +8,11 @@ import './profilesettingspage.css';
 
 function ProfileSettingsPage() {
   const userId = localStorage.getItem('currentUserId') || (() => {
-    const randomId = 'user_' + Math.random().toString(36).substr(2, 9);
+    const randomId = 'user_' + (
+      globalThis.crypto?.randomUUID
+        ? globalThis.crypto.randomUUID()
+        : Array.from(crypto.getRandomValues(new Uint8Array(8)), (b) => b.toString(16).padStart(2, '0')).join('')
+    );
     localStorage.setItem('currentUserId', randomId);
     return randomId;
   })();
@@ -34,6 +38,7 @@ function ProfileSettingsPage() {
   }, []);
 
   const handleSave = useCallback(() => {
+    if (!/^user_[0-9a-f-]+$/.test(userId)) return; // sanitize before persisting
     localStorage.setItem(`user_${userId}`, JSON.stringify(user));
     alert('Settings saved!');
   }, [userId, user]);
