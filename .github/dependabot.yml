@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/kindred"
     schedule:
-      interval: "weekly"
+      interval: "daily"
       day: "monday"
     open-pull-requests-limit: 5
     groups:
@@ -15,7 +15,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/kindred/kindred-backend"
     schedule:
-      interval: "weekly"
+      interval: "daily"
       day: "monday"
     open-pull-requests-limit: 5
     groups:
@@ -27,7 +27,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
       day: "monday"
     open-pull-requests-limit: 5
     groups:
