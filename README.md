@@ -85,6 +85,9 @@ kindred/
 ├── README.md            # This file
 └── kindred/             # React + Vite frontend
     ├── index.html
+    ├── pages/           # ProfileSettingsPage (routed at /profile by src/App.jsx)
+    ├── components/
+    │   └── settings/    # BasicInfoSection, InterestsSection, SaveBar, visibilitySection
     ├── src/
     │   ├── components/  # Nav, journal timeline, title card, hero space
     │   ├── context/     # AuthContext for login state
