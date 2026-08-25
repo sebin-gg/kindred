@@ -22,18 +22,18 @@ router.put('/profile', authenticateToken, async (req, res) => {
   try {
     const { name, location, title, bio, interests, isCommunityVisible } = req.body;
 
+    const updates = { updatedAt: new Date() };
+    if (typeof name === 'string') updates.name = name;
+    if (typeof location === 'string') updates.location = location;
+    if (typeof title === 'string') updates.title = title;
+    if (typeof bio === 'string') updates.bio = bio;
+    if (Array.isArray(interests)) updates.interests = interests.filter(i => typeof i === 'string');
+    if (typeof isCommunityVisible === 'boolean') updates.isCommunityVisible = isCommunityVisible;
+
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      {
-        name,
-        location,
-        title,
-        bio,
-        interests,
-        isCommunityVisible,
-        updatedAt: new Date()
-      },
-      { new: true }
+      updates,
+      { new: true, runValidators: true }
     ).select('-password');
 
     res.json({
