@@ -1,5 +1,7 @@
 ## Kindred – Community Impact Journal & Title Generator
 
+> **Live Demo:** https://kindred-seven-pi.vercel.app
+
 Kindred is a web app that helps everyday volunteers **see, track, and celebrate their impact** across multiple community areas like Environment, Education, Social Work, Healthcare, Animal Welfare, and Disaster Relief.
 
 Instead of traditional “points-only” dashboards, Kindred:

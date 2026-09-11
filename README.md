@@ -1,5 +1,7 @@
 # Kindred
 
+> **Live Demo:** https://kindred-seven-pi.vercel.app
+
 Kindred is a full-stack web app for tracking community impact. Volunteers log their work in a journal, earn points across six impact tracks, and unlock earned titles as their points grow. A shared directory lets people find other volunteers by location and interest.
 
 ## Features
