@@ -5,6 +5,8 @@ import TrackStatsSection from "./TrackStatsSection";
 import CurrentTitleCard from "./CurrentTitleCard";
 import { getCurrentTitle } from "../data/titles";
 import { userAPI } from "../services/api";
+import { useAuth } from "../context/AuthContext.jsx";
+import { getLocalTracks } from "../services/localDemo.js";
 
 // Fallback colors for each track type
 const TRACK_COLORS = {
@@ -31,26 +33,33 @@ function getInitialTitle() {
 }
 
 export default function MyHeroSpace() {
+  const { user } = useAuth();
+  const isLocalDemo = !!user?.localOnly;
   const [userTracks, setUserTracks] = useState(FALLBACK_TRACKS);
   const [currentTitle, setCurrentTitle] = useState(getInitialTitle);
   const [isAnimating, setIsAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Load tracks from the backend so points always come from MongoDB
+  const mapTracks = (apiTracks) =>
+    apiTracks.map((track, index) => ({
+      id: track._id || `track-${index}`,
+      name: track.name,
+      points: track.points ?? 0,
+      color: TRACK_COLORS[track.name] || '#6366f1',
+    }));
+
+  // Load tracks from the backend so points always come from MongoDB.
+  // Local demo guests (no backend) derive points from their browser journal.
   useEffect(() => {
     const loadTracks = async () => {
       try {
         setLoading(true);
+        if (isLocalDemo) {
+          setUserTracks(mapTracks(getLocalTracks(user.id)));
+          return;
+        }
         const apiTracks = await userAPI.getTracks();
-
-        const mapped = apiTracks.map((track, index) => ({
-          id: track._id || `track-${index}`,
-          name: track.name,
-          points: track.points ?? 0,
-          color: TRACK_COLORS[track.name] || '#6366f1',
-        }));
-
-        setUserTracks(mapped);
+        setUserTracks(mapTracks(apiTracks));
       } catch (err) {
         // If anything fails, keep fallback tracks so the UI still works
         console.error('Failed to load tracks from backend:', err);
@@ -60,7 +69,7 @@ export default function MyHeroSpace() {
     };
 
     loadTracks();
-  }, []);
+  }, [user?.id, isLocalDemo]);
 
   const handleGenerate = () => {
     setIsAnimating(true);
