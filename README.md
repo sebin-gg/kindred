@@ -113,6 +113,7 @@ Base URL: `http://localhost:5000/api`
 | --- | --- | --- |
 | POST | `/auth/register` | Create an account and return a token |
 | POST | `/auth/login` | Sign in and return a token |
+| POST | `/auth/guest` | One-click guest login, no form needed, returns a token |
 
 ### Users (`/api/users`, requires a bearer token)
 

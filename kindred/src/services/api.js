@@ -35,9 +35,12 @@ const makeRequest = async (endpoint, method = 'GET', body = null) => {
 export const authAPI = {
   register: (name, email, password) =>
     makeRequest('/auth/register', 'POST', { name, email, password }),
-  
+
   login: (email, password) =>
     makeRequest('/auth/login', 'POST', { email, password }),
+
+  guest: () =>
+    makeRequest('/auth/guest', 'POST'),
 };
 
 // User API calls

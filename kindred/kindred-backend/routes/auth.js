@@ -1,4 +1,5 @@
 import express from 'express';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import User from '../models/User.js';
@@ -6,6 +7,20 @@ import User from '../models/User.js';
 dotenv.config();
 
 const router = express.Router();
+
+const DEFAULT_TRACKS = [
+  { name: 'Environment', points: 0 },
+  { name: 'Education', points: 0 },
+  { name: 'Social Work', points: 0 },
+  { name: 'Healthcare', points: 0 },
+  { name: 'Animal Welfare', points: 0 },
+  { name: 'Disaster Relief', points: 0 }
+];
+
+const signToken = (user) =>
+  jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
+    expiresIn: '7d'
+  });
 
 // Register
 router.post('/register', async (req, res) => {
@@ -36,9 +51,7 @@ router.post('/register', async (req, res) => {
     await user.save();
 
     // Generate token
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: '7d'
-    });
+    const token = signToken(user);
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -72,9 +85,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Generate token
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: '7d'
-    });
+    const token = signToken(user);
 
     res.json({
       message: 'Login successful',
@@ -84,6 +95,40 @@ router.post('/login', async (req, res) => {
         name: user.name,
         email: user.email,
         title: user.currentTitle
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Guest login — one click, no form. Creates a throwaway guest account with a
+// random password (bcrypt-hashed by the User model) and returns a JWT.
+// The password is never sent back to the client, so only the token is stored.
+router.post('/guest', async (req, res) => {
+  try {
+    const guestId = crypto.randomBytes(6).toString('hex');
+    const user = new User({
+      name: `Guest ${guestId.slice(0, 4).toUpperCase()}`,
+      email: `guest-${guestId}@kindred.guest`,
+      password: crypto.randomBytes(32).toString('hex'),
+      isGuest: true,
+      isCommunityVisible: false,
+      tracks: DEFAULT_TRACKS
+    });
+
+    await user.save();
+
+    const token = signToken(user);
+
+    res.status(201).json({
+      message: 'Guest session created',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isGuest: true
       }
     });
   } catch (err) {

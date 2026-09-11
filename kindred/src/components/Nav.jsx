@@ -3,11 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext.jsx';
 
 export default function Nav() {
-  const { token, logout } = useContext(AuthContext);
+  const { user, token, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
+    navigate('/');
+  };
+
+  const handleLogin = () => {
     navigate('/');
   };
 
@@ -75,8 +79,54 @@ export default function Nav() {
           </>
         )}
       </div>
+      {!token && (
+        <button
+          type="button"
+          onClick={handleLogin}
+          style={{
+            padding: '8px 20px',
+            background: 'linear-gradient(135deg, #00f2fe 0%, #4facfe 100%)',
+            color: '#0f172a',
+            border: 'none',
+            borderRadius: '999px',
+            cursor: 'pointer',
+            fontWeight: '700',
+            fontSize: '0.9rem',
+          }}
+        >
+          Login
+        </button>
+      )}
       {token && (
-        <>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span
+            title={user?.email || 'Logged in'}
+            style={{
+              color: '#f9fafb',
+              fontWeight: '600',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            {user?.name || 'Logged in'}
+            {user?.isGuest && (
+              <span style={{
+                padding: '2px 10px',
+                background: 'rgba(74, 222, 128, 0.2)',
+                border: '1px solid rgba(74, 222, 128, 0.6)',
+                color: '#4ade80',
+                borderRadius: '999px',
+                fontSize: '0.7rem',
+                fontWeight: '700',
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}>
+                Guest
+              </span>
+            )}
+          </span>
           <button
             type="button"
             onClick={handleLogout}
@@ -117,7 +167,7 @@ export default function Nav() {
           >
             +
           </Link>
-        </>
+        </div>
       )}
     </nav>
   );

@@ -9,7 +9,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
-  const { login, register } = useAuth();
+  const { login, register, continueAsGuest } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,6 +26,19 @@ export default function AuthPage() {
       } else {
         await register(formData.name, formData.email, formData.password);
       }
+      navigate('/hero-space');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuest = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await continueAsGuest();
       navigate('/hero-space');
     } catch (err) {
       setError(err.message);
@@ -179,6 +192,32 @@ export default function AuthPage() {
           {isLogin ? 'Register' : 'Login'}
         </button>
       </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '20px 0 0', color: '#000' }}>
+        <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.2)' }} />
+        <span style={{ fontSize: '0.85rem' }}>or</span>
+        <div style={{ flex: 1, height: '1px', background: 'rgba(0,0,0,0.2)' }} />
+      </div>
+
+      <button
+        type="button"
+        onClick={handleGuest}
+        disabled={loading}
+        style={{
+          width: '100%',
+          marginTop: '16px',
+          padding: '12px',
+          background: 'rgba(255, 255, 255, 0.9)',
+          color: '#0f172a',
+          border: '2px solid #0f172a',
+          borderRadius: '8px',
+          fontWeight: 'bold',
+          cursor: loading ? 'not-allowed' : 'pointer',
+          opacity: loading ? 0.7 : 1,
+        }}
+      >
+        {loading ? 'Loading...' : 'Continue as Guest — no account needed'}
+      </button>
     </div>
   );
 }
