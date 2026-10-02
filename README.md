@@ -160,3 +160,7 @@ pre-commit install
 ```
 
 Use `git commit --no-verify` only in emergencies. Regular commits should always be scanned.
+
+---
+
+Built by [Sebin Mathew](https://sebin-gg.vercel.app) — full-stack developer and software engineer — more projects, resume, and contact on the [portfolio](https://sebin-gg.vercel.app).
