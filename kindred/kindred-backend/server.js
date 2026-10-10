@@ -32,7 +32,7 @@ app.use(cors({
   },
   credentials: true
 }));
-app.use(express.json());
+app.use(express.json({ limit: '100kb' }));
 
 // Rate limiting: global API limiter plus stricter limiter for auth endpoints
 const apiLimiter = rateLimit({
@@ -44,6 +44,12 @@ const apiLimiter = rateLimit({
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false
+});
+const writeLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 120,
   standardHeaders: 'draft-7',
   legacyHeaders: false
 });
@@ -74,8 +80,8 @@ try {
 
 // Routes
 app.use('/api/auth', authLimiter, authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/journal', journalRoutes);
+app.use('/api/users', writeLimiter, userRoutes);
+app.use('/api/journal', writeLimiter, journalRoutes);
 app.use('/api/community', communityRoutes);
 
 // Health check

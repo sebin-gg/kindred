@@ -6,27 +6,30 @@ const router = express.Router();
 const escapeRegex = (s) => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // Get all visible community members
+// Public by design, but only safe directory fields are exposed (never email,
+// tracks, titles, or internal ids beyond the profile id).
 router.get('/members', async (req, res) => {
   try {
     const { location, interest } = req.query;
 
     let query = { isCommunityVisible: true };
 
-    if (location) {
-      query.location = { $regex: escapeRegex(location), $options: 'i' };
+    if (typeof location === 'string' && location.trim()) {
+      query.location = { $regex: escapeRegex(location.trim().slice(0, 100)), $options: 'i' };
     }
 
-    if (interest) {
-      query.interests = { $in: [interest] };
+    if (typeof interest === 'string' && interest.trim()) {
+      query.interests = { $in: [interest.trim().slice(0, 100)] };
     }
 
     const members = await User.find(query)
-      .select('-password')
-      .sort({ createdAt: -1 });
+      .select('name title location bio interests isCommunityVisible createdAt')
+      .sort({ createdAt: -1 })
+      .limit(100);
 
     res.json(members);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to load members' });
   }
 });
 
@@ -34,7 +37,7 @@ router.get('/members', async (req, res) => {
 router.get('/members/:userId', async (req, res) => {
   try {
     const member = await User.findById(req.params.userId)
-      .select('-password');
+      .select('name title location bio interests isCommunityVisible createdAt');
 
     if (!member?.isCommunityVisible) {
       return res.status(404).json({ error: 'Member not found' });
@@ -42,7 +45,7 @@ router.get('/members/:userId', async (req, res) => {
 
     res.json(member);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to load member' });
   }
 });
 
@@ -55,11 +58,11 @@ router.get('/stats', async (req, res) => {
 
     res.json({
       totalMembers,
-      locations,
-      interests
+      locations: locations.filter((l) => typeof l === 'string' && l).slice(0, 200),
+      interests: interests.filter((i) => typeof i === 'string' && i).slice(0, 200)
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to load stats' });
   }
 });
 

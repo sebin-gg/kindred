@@ -13,7 +13,7 @@ router.get('/profile', authenticateToken, async (req, res) => {
     }
     res.json(user);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to load profile' });
   }
 });
 
@@ -23,11 +23,11 @@ router.put('/profile', authenticateToken, async (req, res) => {
     const { name, location, title, bio, interests, isCommunityVisible } = req.body;
 
     const updates = { updatedAt: new Date() };
-    if (typeof name === 'string') updates.name = name;
-    if (typeof location === 'string') updates.location = location;
-    if (typeof title === 'string') updates.title = title;
-    if (typeof bio === 'string') updates.bio = bio;
-    if (Array.isArray(interests)) updates.interests = interests.filter(i => typeof i === 'string');
+    if (typeof name === 'string' && name.trim()) updates.name = name.trim().slice(0, 100);
+    if (typeof location === 'string') updates.location = location.slice(0, 200);
+    if (typeof title === 'string') updates.title = title.slice(0, 100);
+    if (typeof bio === 'string') updates.bio = bio.slice(0, 1000);
+    if (Array.isArray(interests)) updates.interests = interests.filter(i => typeof i === 'string').map(i => i.slice(0, 100)).slice(0, 50);
     if (typeof isCommunityVisible === 'boolean') updates.isCommunityVisible = isCommunityVisible;
 
     const user = await User.findByIdAndUpdate(
@@ -41,27 +41,40 @@ router.put('/profile', authenticateToken, async (req, res) => {
       user
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 
 // Get user tracks
 router.get('/tracks', authenticateToken, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select('tracks');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     res.json(user.tracks);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to load tracks' });
   }
 });
 
 // Update track points
+// NOTE: self-awarded points are the remaining integrity risk. Journal creation
+// is the trusted path (+10); this endpoint is kept for profile UX but is
+// clamped below so a compromised token cannot mint arbitrary points.
 router.put('/tracks/:trackName', authenticateToken, async (req, res) => {
   try {
     const { trackName } = req.params;
     const { points } = req.body;
 
+    if (typeof points !== 'number' || !Number.isFinite(points) || points < 0 || points > 100000) {
+      return res.status(400).json({ error: 'Points must be a number 0-100000' });
+    }
+
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
     const track = user.tracks.find(t => t.name === trackName);
 
     if (!track) {
@@ -76,7 +89,7 @@ router.put('/tracks/:trackName', authenticateToken, async (req, res) => {
       tracks: user.tracks
     });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to update track' });
   }
 });
 
