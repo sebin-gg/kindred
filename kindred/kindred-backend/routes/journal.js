@@ -40,7 +40,7 @@ router.post('/entries', authenticateToken, async (req, res) => {
       message: 'Journal entry created successfully',
       entry
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to create entry' });
   }
 });
@@ -51,7 +51,7 @@ router.get('/entries', authenticateToken, async (req, res) => {
   try {
     const entries = await JournalEntry.find({ userId: req.user.id }).sort({ createdAt: -1 }).limit(200);
     res.json(entries);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to load entries' });
   }
 });
@@ -70,7 +70,7 @@ router.delete('/entries/:entryId', authenticateToken, async (req, res) => {
     }
 
     res.json({ message: 'Entry deleted successfully' });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to delete entry' });
   }
 });

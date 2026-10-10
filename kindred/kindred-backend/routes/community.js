@@ -28,7 +28,7 @@ router.get('/members', async (req, res) => {
       .limit(100);
 
     res.json(members);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to load members' });
   }
 });
@@ -44,7 +44,7 @@ router.get('/members/:userId', async (req, res) => {
     }
 
     res.json(member);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to load member' });
   }
 });
@@ -61,7 +61,7 @@ router.get('/stats', async (req, res) => {
       locations: locations.filter((l) => typeof l === 'string' && l).slice(0, 200),
       interests: interests.filter((i) => typeof i === 'string' && i).slice(0, 200)
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to load stats' });
   }
 });

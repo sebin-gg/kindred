@@ -12,7 +12,7 @@ router.get('/profile', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     res.json(user);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to load profile' });
   }
 });
@@ -40,7 +40,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
       message: 'Profile updated successfully',
       user
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to update profile' });
   }
 });
@@ -53,7 +53,7 @@ router.get('/tracks', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
     res.json(user.tracks);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to load tracks' });
   }
 });
@@ -88,7 +88,7 @@ router.put('/tracks/:trackName', authenticateToken, async (req, res) => {
       message: 'Track updated successfully',
       tracks: user.tracks
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Failed to update track' });
   }
 });

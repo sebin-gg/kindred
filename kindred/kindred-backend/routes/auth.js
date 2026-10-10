@@ -106,7 +106,7 @@ router.post('/login', async (req, res) => {
         title: user.currentTitle
       }
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: 'Login failed' });
   }
 });
