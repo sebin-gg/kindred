@@ -27,7 +27,7 @@ router.put('/profile', authenticateToken, async (req, res) => {
     if (typeof location === 'string') updates.location = location.slice(0, 200);
     if (typeof title === 'string') updates.title = title.slice(0, 100);
     if (typeof bio === 'string') updates.bio = bio.slice(0, 1000);
-    if (Array.isArray(interests)) updates.interests = interests.filter(i => typeof i === 'string').map(i => i.slice(0, 100)).slice(0, 50);
+    if (Array.isArray(interests)) updates.interests = [...new Set(interests.filter(i => typeof i === 'string').map(i => i.slice(0, 100)))].slice(0, 50);
     if (typeof isCommunityVisible === 'boolean') updates.isCommunityVisible = isCommunityVisible;
 
     const user = await User.findByIdAndUpdate(
@@ -35,6 +35,10 @@ router.put('/profile', authenticateToken, async (req, res) => {
       updates,
       { new: true, runValidators: true }
     ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     res.json({
       message: 'Profile updated successfully',
