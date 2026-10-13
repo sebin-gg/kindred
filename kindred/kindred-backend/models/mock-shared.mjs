@@ -41,36 +41,37 @@ function project(docs, fields, limit) {
   return result;
 }
 
-export class Query {
-  constructor(doc, fields) {
-    this._isArray = Array.isArray(doc);
-    this._docs = this._isArray ? doc : [doc];
-    this._fields = fields;
-  }
-  _toResult() {
-    if (this._isArray) return project(this._docs, this._fields, this._limit);
-    return selectDoc(this._docs[0], this._fields);
-  }
-  then(resolve, reject) {
-    resolve(this._toResult());
-  }
-  catch() {
-    return this;
-  }
-  select(fields) {
-    this._fields = fields;
-    return this;
-  }
-  sort() {
-    return this;
-  }
-  limit(n) {
-    this._limit = n;
-    return this;
-  }
-  exec() {
-    return Promise.resolve(this._toResult());
-  }
+export function makeQuery(doc, fields) {
+  const state = {
+    isArray: Array.isArray(doc),
+    docs: Array.isArray(doc) ? doc : [doc],
+    fields: fields ?? null,
+    limit: undefined,
+  };
+  const toResult = () => {
+    if (state.isArray) {
+      const result = state.docs.map((d) => selectDoc(d, state.fields));
+      return state.limit !== undefined ? result.slice(0, state.limit) : result;
+    }
+    return selectDoc(state.docs[0], state.fields);
+  };
+  // Plain object with a thenable surface. It must NOT be a real Promise
+  // instance: awaiting a same-realm native Promise reads its internal state
+  // and bypasses a shadowed `then` (yielding undefined). `then` lives on the
+  // object, not on a class (Sonar S2569).
+  const query = {
+    select(field) { state.fields = field; return query; },
+    limit(n) { state.limit = n; return query; },
+    sort() { return query; },
+    exec() { return Promise.resolve(toResult()); },
+    then(onFulfilled, onRejected) {
+      return Promise.resolve(toResult()).then(onFulfilled, onRejected);
+    },
+    catch(onRejected) {
+      return Promise.resolve(toResult()).then(undefined, onRejected);
+    },
+  };
+  return query;
 }
 
 export async function storeDeleteOne(store, query) {
