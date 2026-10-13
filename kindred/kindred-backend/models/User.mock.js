@@ -2,7 +2,7 @@
 // Test double for the User mongoose model (real schema fields preserved).
 // Used via the ESM loader redirect in test/mocks-loader.mjs.
 // Shared machinery lives in models/mock-shared.mjs.
-import { Query, nextMockId, selectDoc, storeDeleteOne, storeExists } from './mock-shared.mjs';
+import { makeQuery, nextMockId, selectDoc, storeDeleteOne, storeExists } from './mock-shared.mjs';
 
 class MockUser {
   constructor(doc = {}) {
@@ -46,17 +46,17 @@ MockUser.findOne = async function (query) {
   if (!query || !query.email) return null;
   const normalized = String(query.email).toLowerCase();
   const user = Object.values(MockUser.store).find((u) => u.email === normalized);
-  return user ? new Query(user, null) : null;
+  return user ? makeQuery(user, null) : null;
 };
 
 MockUser.findById = function (id) {
   const user = MockUser.store[id];
-  return new Query(user, null);
+  return makeQuery(user, null);
 };
 
 MockUser.find = function (query) {
   let users = Object.values(MockUser.store).filter((u) => u && typeof u === 'object' && u._id);
-  if (!query) return new Query(users, null);
+  if (!query) return makeQuery(users, null);
   if (query.isCommunityVisible === true) {
     users = users.filter((u) => u.isCommunityVisible);
   }
@@ -73,7 +73,7 @@ MockUser.find = function (query) {
   if (Array.isArray(query.interests)) {
     users = users.filter((u) => query.interests.some((i) => u.interests.includes(i)));
   }
-  return new Query(users, null);
+  return makeQuery(users, null);
 };
 
 MockUser.deleteOne = function (query) {
@@ -86,7 +86,7 @@ MockUser.exists = async function (query) {
 
 MockUser.findByIdAndUpdate = function (id, updates, options = {}) {
   const user = MockUser.store[id];
-  if (!user) return new Query(null, null);
+  if (!user) return makeQuery(null, null);
   for (const key of Object.keys(updates)) {
     if (key === 'updatedAt') { user.updatedAt = updates.updatedAt; continue; }
     if (key === 'name' && typeof updates.name === 'string') user.name = updates.name.trim().slice(0, 100);
@@ -99,7 +99,7 @@ MockUser.findByIdAndUpdate = function (id, updates, options = {}) {
   }
   user.updatedAt = new Date();
   if (!options || !options.new) return user;
-  return new Query(selectDoc(user, '-password'), null);
+  return makeQuery(selectDoc(user, '-password'), null);
 };
 
 MockUser.countDocuments = async function (query) {

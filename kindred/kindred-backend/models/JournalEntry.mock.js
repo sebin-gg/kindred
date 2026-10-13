@@ -2,7 +2,7 @@
 // Test double for the JournalEntry mongoose model.
 // Used via the ESM loader redirect in test/mocks-loader.mjs.
 // Shared machinery lives in models/mock-shared.mjs.
-import { Query, nextMockId, storeDeleteOne, storeExists } from './mock-shared.mjs';
+import { makeQuery, nextMockId, storeDeleteOne, storeExists } from './mock-shared.mjs';
 
 class MockJournalEntry {
   constructor(doc = {}) {
@@ -33,21 +33,21 @@ MockJournalEntry.store = {};
 MockJournalEntry.findOne = function (query) {
   if (!query || !query.userId) return null;
   const entry = Object.values(MockJournalEntry.store).find((e) => e.userId === query.userId);
-  return entry ? new Query(entry, null) : null;
+  return entry ? makeQuery(entry, null) : null;
 };
 
 MockJournalEntry.findById = function (id) {
   const entry = MockJournalEntry.store[id];
-  return new Query(entry, null);
+  return makeQuery(entry, null);
 };
 
 MockJournalEntry.find = function (query) {
   let entries = Object.values(MockJournalEntry.store);
-  if (!query) return new Query(entries, null);
+  if (!query) return makeQuery(entries, null);
   if (query.userId) {
     entries = entries.filter((e) => e.userId === query.userId);
   }
-  return new Query(entries, null);
+  return makeQuery(entries, null);
 };
 
 MockJournalEntry.deleteOne = function (query) {
