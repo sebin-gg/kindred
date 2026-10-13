@@ -11,7 +11,7 @@ const modelsDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 
 export async function resolve(specifier, context, nextResolve) {
   // First try normal resolution.
   const resolved = await nextResolve(specifier, context);
-  if (!resolved.url || !resolved.url.startsWith('file:')) return resolved;
+  if (!resolved.url?.startsWith('file:')) return resolved;
 
   const target = fileURLToPath(resolved.url);
   const name = path.basename(target);
