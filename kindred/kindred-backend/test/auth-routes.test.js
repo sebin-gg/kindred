@@ -26,9 +26,7 @@ describe('auth routes', () => {
   app.use('/api/auth', authRoutes);
 
   afterEach(() => {
-    console.error('AFTEREACH: store ref =', User.store, 'keys before reset =', Object.keys(User.store));
     User.store = {};
-    console.error('AFTEREACH: store after reset =', User.store);
   });
 
   function tokenFor(id, email = 'test@example.com') {
@@ -93,10 +91,8 @@ describe('auth routes', () => {
       assert.strictEqual(body.user.name, 'Alice');
       assert.strictEqual(body.user.email, 'alice@example.com');
       assert.ok(body.user.id, 'user has an _id');
-      console.error('TEST-201: store keys =', Object.keys(User.store));
       assert.ok(User.store[decoded.id], 'user saved in mock store');
       const stored = await User.findOne({ email: 'alice@example.com' });
-      console.error('TEST-201: after findOne store =', Object.keys(User.store), stored ? stored.email : null);
     });
   });
 
@@ -141,7 +137,6 @@ describe('auth routes', () => {
       const reg = await request(app)
         .post('/api/auth/register')
         .send({ name: 'Alice', email: 'alice@example.com', password: 'correctpw' });
-      console.error('REG:', reg.statusCode, reg.body);
       const { body, statusCode } = await request(app)
         .post('/api/auth/login')
         .send({ email: 'ALICE@EXAMPLE.COM', password: 'correctpw' });
@@ -160,7 +155,6 @@ describe('auth routes', () => {
           .post('/api/auth/register')
           .send({ name: 'NoSecret', email: 'no-jwt@example.com', password: 'password123' });
       } catch (err) {
-        console.error('register error:', err.message, err.stack);
         throw err;
       }
       assert.strictEqual(r1.statusCode, 500);
@@ -170,7 +164,6 @@ describe('auth routes', () => {
           .post('/api/auth/login')
           .send({ email: 'no-jwt@example.com', password: 'password123' });
       } catch (err) {
-        console.error('login error:', err.message, err.stack);
         throw err;
       }
       assert.strictEqual(r2.statusCode, 500);

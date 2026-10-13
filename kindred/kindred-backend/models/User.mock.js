@@ -1,78 +1,8 @@
 // models/User.mock.js
 // Test double for the User mongoose model (real schema fields preserved).
 // Used via the ESM loader redirect in test/mocks-loader.mjs.
-
-function selectDoc(doc, fields) {
-  if (doc == null) return null;
-  const out = { ...doc };
-  // Object spread only copies own properties; also copy prototype methods
-  // (e.g., comparePassword) so selected docs remain usable.
-  const proto = Object.getPrototypeOf(doc);
-  for (const key of Object.getOwnPropertyNames(proto)) {
-    if (typeof doc[key] === 'function') {
-      out[key] = doc[key];
-    }
-  }
-  if (!fields) return out;
-  const parts = fields.split(' ').filter((f) => f);
-  const excludes = parts.filter((f) => f.startsWith('-')).map((f) => f.slice(1));
-  const includes = parts.filter((f) => !f.startsWith('-'));
-  for (const f of excludes) {
-    delete out[f];
-  }
-  if (includes.length) {
-    for (const key of Object.keys(out)) {
-      if (!includes.includes(key)) {
-        delete out[key];
-      }
-    }
-  }
-  return out;
-}
-
-class Query {
-  constructor(doc, fields) {
-    this._isArray = Array.isArray(doc);
-    this._docs = this._isArray ? doc : [doc];
-    this._fields = fields;
-  }
-  then(resolve, reject) {
-    let result = this._docs.map((doc) => selectDoc(doc, this._fields));
-    if (this._isArray) {
-      if (this._limit) {
-        result = result.slice(0, this._limit);
-      }
-    } else {
-      result = result[0];
-    }
-    resolve(result);
-  }
-  catch() {
-    return this;
-  }
-  select(fields) {
-    this._fields = fields;
-    return this;
-  }
-  sort() {
-    return this;
-  }
-  limit(n) {
-    this._limit = n;
-    return this;
-  }
-  exec() {
-    let result = this._docs.map((doc) => selectDoc(doc, this._fields));
-    if (this._isArray) {
-      if (this._limit) {
-        result = result.slice(0, this._limit);
-      }
-    } else {
-      result = result[0];
-    }
-    return Promise.resolve(result);
-  }
-}
+// Shared machinery lives in models/mock-shared.mjs.
+import { Query, nextMockId, selectDoc, storeDeleteOne, storeExists } from './mock-shared.mjs';
 
 class MockUser {
   constructor(doc = {}) {
@@ -90,7 +20,7 @@ class MockUser {
     this.currentTitle = doc.currentTitle || 'Newcomer';
     this.createdAt = doc.createdAt || new Date();
     this.updatedAt = doc.updatedAt || new Date();
-    this._id = doc._id || `507f${Math.random().toString(36).slice(2, 12)}77bcf86cd799439011`;
+    this._id = doc._id || nextMockId();
   }
 
   async comparePassword(candidate) {
@@ -111,9 +41,6 @@ class MockUser {
 
 // In-memory store: map _id -> user instance.
 MockUser.store = {};
-
-const storeLoadCount = (function () { let n = 0; return () => ++n; })();
-console.error('USERS.JS store ref loaded at:', MockUser.store, '| uid:', storeLoadCount());
 
 MockUser.findOne = async function (query) {
   if (!query || !query.email) return null;
@@ -149,24 +76,18 @@ MockUser.find = function (query) {
   return new Query(users, null);
 };
 
-MockUser.deleteOne = async function (query) {
-  const entry = MockUser.store[query._id];
-  const matchesId = !!entry;
-  const matchesUser = entry && entry.userId === query.userId;
-  const deleted = matchesId && matchesUser;
-  if (deleted) delete MockUser.store[query._id];
-  return { deletedCount: deleted ? 1 : 0 };
+MockUser.deleteOne = function (query) {
+  return storeDeleteOne(MockUser.store, query);
 };
 
 MockUser.exists = async function (query) {
-  return !!(query && MockUser.store[query._id]);
+  return storeExists(MockUser.store, query);
 };
 
 MockUser.findByIdAndUpdate = function (id, updates, options = {}) {
   const user = MockUser.store[id];
   if (!user) return new Query(null, null);
-  const keys = Object.keys(updates);
-  for (const key of keys) {
+  for (const key of Object.keys(updates)) {
     if (key === 'updatedAt') { user.updatedAt = updates.updatedAt; continue; }
     if (key === 'name' && typeof updates.name === 'string') user.name = updates.name.trim().slice(0, 100);
     else if (key === 'location' && typeof updates.location === 'string') user.location = updates.location.slice(0, 200);
@@ -177,11 +98,12 @@ MockUser.findByIdAndUpdate = function (id, updates, options = {}) {
     else user[key] = updates[key];
   }
   user.updatedAt = new Date();
-  return options && options.new ? new Query(user, '-password') : user;
+  if (!options || !options.new) return user;
+  return new Query(selectDoc(user, '-password'), null);
 };
 
 MockUser.countDocuments = async function (query) {
-  const users = Object.values(MockUser.store).filter((u) => u && typeof u === 'object' && u._id);
+  const users = Object.values(MockUser.store);
   if (!query || query.isCommunityVisible === true) return users.filter((u) => u.isCommunityVisible).length;
   if (query.isCommunityVisible === false) return users.filter((u) => !u.isCommunityVisible).length;
   return users.length;
