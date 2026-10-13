@@ -5,30 +5,20 @@
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 // models/ lives in the backend root; resolve relative to this loader's location.
-const modelsDir = path.join(__dirname, '..', 'models');
-
-const modelsRE = /(?:^|[/\\])models[/\\][A-Za-z0-9_.-]+\.js$/;
+const modelsDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'models');
 
 export async function resolve(specifier, context, nextResolve) {
   // First try normal resolution.
   const resolved = await nextResolve(specifier, context);
-  if (!resolved.url) return resolved;
-  console.error('RESOLVE:', specifier, '->', resolved.url);
-  // Check if the resolved path points to a models/<name>.js file.
-  const urlPath = resolved.url.replace(/^file:\/\//, '').replace(/\//g, '\\');
-  const fileName = urlPath.split(/[/\\]/).pop();
-  if (fileName.endsWith('.mock.js')) {
-    return resolved;
-  }
-  if (modelsRE.test(urlPath)) {
-    const name = path.basename(urlPath).replace('.js', '');
-    const mockPath = path.join(modelsDir, name + '.mock.js');
-    const redirectUrl = pathToFileURL(mockPath).href;
-    console.error('LOADER redirecting:', specifier, '-> redirectUrl =', redirectUrl);
-    return { url: redirectUrl };
-  }
-  return resolved;
+  if (!resolved.url || !resolved.url.startsWith('file:')) return resolved;
+
+  const target = fileURLToPath(resolved.url);
+  const name = path.basename(target);
+  if (name.endsWith('.mock.js')) return resolved;
+  // Only redirect code files under a models/ directory.
+  if (!name.endsWith('.js') || path.basename(path.dirname(target)) !== 'models') return resolved;
+
+  const mockPath = path.join(modelsDir, name.replace(/\.js$/, '.mock.js'));
+  return { url: pathToFileURL(mockPath).href };
 }
