@@ -35,16 +35,21 @@ jobs:
         working-directory: kindred/kindred-backend
         run: npm ci --ignore-scripts
       # Coverage must be generated from the repository root so the lcov `SF:`
-      # paths stay relative to the Sonar project base directory.
+      # paths stay relative to the Sonar project base directory. The test files
+      # are named by glob because the test runner does not accept a bare
+      # directory before Node 26. The spec reporter keeps failures readable in
+      # the job log while the lcov reporter writes the report Sonar consumes.
       - name: Generate backend coverage (lcov)
         run: |
           mkdir -p coverage
           node --import ./kindred/kindred-backend/test/test-loader.mjs \
             --test \
             --experimental-test-coverage \
+            --test-reporter=spec \
+            --test-reporter-destination=stdout \
             --test-reporter=lcov \
             --test-reporter-destination=coverage/lcov.info \
-            kindred/kindred-backend/test
+            'kindred/kindred-backend/test/**/*.test.js'
       - name: SonarQube Cloud Scan
         uses: SonarSource/sonarqube-scan-action@d209202bc7d53ff1cc128f7f907dac145c9d6ae9 # v8.3.0
         env:
