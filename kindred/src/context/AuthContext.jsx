@@ -25,9 +25,9 @@ const loadStoredSession = () => {
 };
 
 const makeLocalGuest = () => {
-  const id = `local-guest-${Math.random().toString(36).slice(2, 10)}`;
+  const id = `local-guest-${crypto.randomUUID()}`;
   return {
-    token: `local-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`,
+    token: `local-${crypto.randomUUID()}`,
     user: {
       id,
       name: `Guest ${id.slice(-4).toUpperCase()}`,

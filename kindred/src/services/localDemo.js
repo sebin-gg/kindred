@@ -17,35 +17,83 @@ export const TRACK_NAMES = [
 
 export const POINTS_PER_ENTRY = 10;
 
+const MAX_LOCAL_ENTRIES = 200;
+const MAX_ENTRY_CONTENT_LENGTH = 5000;
+const SAFE_ID_PATTERN = /^[a-zA-Z0-9_-]{1,128}$/;
+
+const isSafeId = (value) => typeof value === 'string' && SAFE_ID_PATTERN.test(value);
+
 const entriesKey = (userId) => `kindred_demo_entries_${userId}`;
 
+const normalizeEntry = (value) => {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+
+  const id = isSafeId(value._id) ? value._id : null;
+  const fallbackId = isSafeId(value.id) ? value.id : null;
+  const safeId = id ?? fallbackId;
+  if (!safeId || typeof value.content !== 'string' || !TRACK_NAMES.includes(value.category)) return null;
+
+  const timestamp = typeof value.createdAt === 'string' ? Date.parse(value.createdAt) : Number.NaN;
+  if (!Number.isFinite(timestamp)) return null;
+
+  const timestampDate = new Date(timestamp);
+  if (Number.isNaN(timestampDate.getTime())) return null;
+
+  const createdAt = timestampDate.toISOString();
+  const date = typeof value.date === 'string' && value.date.length <= 64
+    ? value.date
+    : timestampDate.toLocaleDateString();
+
+  // Rebuild from the known fields. Stored objects are untrusted and must not
+  // carry arbitrary properties or user-controlled point totals into the UI.
+  return {
+    _id: safeId,
+    id: safeId,
+    content: value.content.slice(0, MAX_ENTRY_CONTENT_LENGTH),
+    category: value.category,
+    pointsEarned: POINTS_PER_ENTRY,
+    date,
+    createdAt,
+  };
+};
+
 export const getLocalEntries = (userId) => {
-  if (!userId) return [];
+  if (!isSafeId(userId)) return [];
   try {
     const raw = localStorage.getItem(entriesKey(userId));
     const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed)
+      ? parsed.slice(0, MAX_LOCAL_ENTRIES).map(normalizeEntry).filter(Boolean)
+      : [];
   } catch {
     return [];
   }
 };
 
 const setLocalEntries = (userId, entries) => {
-  localStorage.setItem(entriesKey(userId), JSON.stringify(entries));
+  if (!isSafeId(userId) || !Array.isArray(entries)) return;
+  const safeEntries = entries
+    .slice(0, MAX_LOCAL_ENTRIES)
+    .map(normalizeEntry)
+    .filter(Boolean);
+  localStorage.setItem(entriesKey(userId), JSON.stringify(safeEntries));
 };
 
 export const createLocalEntry = (userId, { content, category }) => {
+  if (!isSafeId(userId)) throw new TypeError('Invalid local demo user id');
+
   const now = new Date();
-  const entry = {
-    _id: `local-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+  const entry = normalizeEntry({
+    _id: `local-${crypto.randomUUID()}`,
     content,
     category,
     pointsEarned: POINTS_PER_ENTRY,
     date: now.toLocaleDateString(),
     createdAt: now.toISOString(),
-  };
-  entry.id = entry._id;
-  const entries = [entry, ...getLocalEntries(userId)];
+  });
+  if (!entry) throw new TypeError('Invalid local demo entry');
+
+  const entries = [entry, ...getLocalEntries(userId)].slice(0, MAX_LOCAL_ENTRIES);
   setLocalEntries(userId, entries);
   return entry;
 };
