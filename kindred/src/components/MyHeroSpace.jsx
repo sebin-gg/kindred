@@ -68,7 +68,7 @@ export default function MyHeroSpace() {
       }
     };
 
-    loadTracks();
+    void loadTracks();
   }, [user?.id, isLocalDemo]);
 
   const handleGenerate = () => {

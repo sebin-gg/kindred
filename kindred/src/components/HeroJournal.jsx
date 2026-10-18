@@ -66,7 +66,7 @@ export default function HeroJournal() {
       }
     };
 
-    loadData();
+    void loadData();
   }, [user?.id, isLocalDemo]);
 
   const onAddEntry = async (entry) => {
