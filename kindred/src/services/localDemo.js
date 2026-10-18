@@ -28,10 +28,12 @@ const entriesKey = (userId) => `kindred_demo_entries_${userId}`;
 const normalizeEntry = (value) => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
 
-  const id = isSafeId(value._id) ? value._id : isSafeId(value.id) ? value.id : null;
-  if (!id || typeof value.content !== 'string' || !TRACK_NAMES.includes(value.category)) return null;
+  const id = isSafeId(value._id) ? value._id : null;
+  const fallbackId = isSafeId(value.id) ? value.id : null;
+  const safeId = id ?? fallbackId;
+  if (!safeId || typeof value.content !== 'string' || !TRACK_NAMES.includes(value.category)) return null;
 
-  const timestamp = typeof value.createdAt === 'string' ? Date.parse(value.createdAt) : NaN;
+  const timestamp = typeof value.createdAt === 'string' ? Date.parse(value.createdAt) : Number.NaN;
   if (!Number.isFinite(timestamp)) return null;
 
   const timestampDate = new Date(timestamp);
@@ -45,8 +47,8 @@ const normalizeEntry = (value) => {
   // Rebuild from the known fields. Stored objects are untrusted and must not
   // carry arbitrary properties or user-controlled point totals into the UI.
   return {
-    _id: id,
-    id,
+    _id: safeId,
+    id: safeId,
     content: value.content.slice(0, MAX_ENTRY_CONTENT_LENGTH),
     category: value.category,
     pointsEarned: POINTS_PER_ENTRY,
