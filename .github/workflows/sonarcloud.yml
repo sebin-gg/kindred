@@ -30,7 +30,7 @@ jobs:
       # Node >= 22.8 is required for the built-in `lcov` test reporter.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 24
+          node-version: 24.22.1
           cache: npm
           cache-dependency-path: kindred/kindred-backend/package-lock.json
       - name: Install backend dependencies
